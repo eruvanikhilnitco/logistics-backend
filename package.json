@@ -1,20 +1,25 @@
 {
   "name": "logistics-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI Logistics Backend with OCR + n8n integration",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eruvanikhilnitco/logistics-backend.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "logistics",
+    "n8n",
+    "ocr",
+    "automation"
+  ],
+  "author": "Akhil",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/eruvanikhilnitco/logistics-backend/issues"
   },
@@ -25,6 +30,5 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.1.1"
-  },
-  "devDependencies": {}
+  }
 }
