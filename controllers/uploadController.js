@@ -1,6 +1,6 @@
-const axios = require("axios");
+import axios from "axios";
 
-exports.handleUpload = async (req, res) => {
+const handleUpload = async (req, res) => {
   try {
     const files = req.files;
     const { email } = req.body;
@@ -26,7 +26,9 @@ exports.handleUpload = async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ error: "Upload failed" });
   }
 };
+
+export default { handleUpload };
