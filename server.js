@@ -1,14 +1,20 @@
 import express from "express";
+import cors from "cors";
 import uploadRoutes from "./routes/upload.js";
 
 const app = express();
 
-app.use(express.json());
+// ✅ VERY IMPORTANT (fixes frontend → backend calls)
+app.use(cors());
 
-// existing route
+// ✅ Required for JSON + form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ Routes
 app.use("/api/upload", uploadRoutes);
 
-// 👇 ADD THIS BLOCK HERE
+// ✅ Deliveries API
 app.get("/api/deliveries", async (req, res) => {
   try {
     const data = [
@@ -22,7 +28,12 @@ app.get("/api/deliveries", async (req, res) => {
   }
 });
 
-// server start
+// ✅ Root check (optional but useful)
+app.get("/", (req, res) => {
+  res.send("Backend Running 🚀");
+});
+
+// ✅ Server start
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
