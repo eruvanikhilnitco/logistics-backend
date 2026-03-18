@@ -1,34 +1,41 @@
 import express from "express";
 import cors from "cors";
 import uploadRoutes from "./routes/upload.js";
+import { createClient } from "@supabase/supabase-js"; // ✅ ADDED
 
 const app = express();
 
-// ✅ VERY IMPORTANT (fixes frontend → backend calls)
-app.use(cors());
+// ✅ Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-// ✅ Required for JSON + form data
+// ✅ Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ Routes
 app.use("/api/upload", uploadRoutes);
 
-// ✅ Deliveries API
+// ✅ Deliveries API (NOW REAL DATA)
 app.get("/api/deliveries", async (req, res) => {
   try {
-    const data = [
-      { shipment_id: "123", status: "completed", charges: 500 },
-      { shipment_id: "124", status: "pending", charges: 300 }
-    ];
+    const { data, error } = await supabase
+      .from("deliveries")
+      .select("*");
+
+    if (error) throw error;
 
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ Root check (optional but useful)
+// ✅ Root check
 app.get("/", (req, res) => {
   res.send("Backend Running 🚀");
 });

@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/eruvanikhilnitco/logistics-backend#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.2",
     "axios": "^1.13.6",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
