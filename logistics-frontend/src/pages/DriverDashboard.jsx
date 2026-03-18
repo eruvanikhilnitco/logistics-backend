@@ -1,87 +1,94 @@
 import { useEffect, useState } from "react";
-import UploadForm from "../components/UploadForm";
-import { getDeliveries } from "../services/api";
+import axios from "axios";
+import {
+  PieChart, Pie, Cell, Tooltip,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
+} from "recharts";
+
+const COLORS = ["#22c55e", "#f59e0b", "#ef4444"];
 
 export default function DriverDashboard() {
-  const [deliveries, setDeliveries] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetchData();
+    axios.get("https://logistics-backend-0zah.onrender.com/api/deliveries")
+      .then(res => setData(res.data))
+      .catch(err => console.log(err));
   }, []);
 
-  const fetchData = async () => {
+  // ✅ Upload Function
+  const handleUpload = async (e) => {
+    const files = e.target.files;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
+
+    formData.append("email", "client@email.com");
+
     try {
-      const res = await getDeliveries();
-      setDeliveries(res.data);
+      await axios.post(
+        "https://logistics-backend-0zah.onrender.com/api/upload/upload",
+        formData
+      );
+
+      alert("✅ Uploaded → processed via n8n");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      alert("❌ Upload failed");
     }
   };
 
-  return (
-    <div className="flex min-h-screen bg-gray-100">
+  // ✅ Stats
+  const completed = data.filter(d => d.status === "completed").length;
+  const pending = data.filter(d => d.status === "pending").length;
+  const totalRevenue = data.reduce((acc, d) => acc + d.charges, 0);
 
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow p-5">
-        <h2 className="text-xl font-bold mb-6 text-blue-600">
-          AutoLogix
-        </h2>
+  const pieData = [
+    { name: "Completed", value: completed },
+    { name: "Pending", value: pending }
+  ];
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>🚚 Driver Dashboard</h1>
+
+      {/* Stats */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+        <div>📦 Total: {data.length}</div>
+        <div>✅ Completed: {completed}</div>
+        <div>⏳ Pending: {pending}</div>
+        <div>💰 ₹{totalRevenue}</div>
       </div>
 
-      {/* Main */}
-      <div className="flex-1 p-6">
+      {/* Upload Section */}
+      <div style={{ marginBottom: "30px" }}>
+        <h3>📤 Upload Invoice / Receipt</h3>
+        <input type="file" multiple onChange={handleUpload} />
+      </div>
 
-        <h1 className="text-2xl font-bold mb-6">
-          Driver Dashboard
-        </h1>
+      {/* Charts */}
+      <div style={{ display: "flex", gap: "40px" }}>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 shadow rounded">
-            Total: {deliveries.length}
-          </div>
+        {/* Pie Chart */}
+        <PieChart width={300} height={300}>
+          <Pie data={pieData} dataKey="value">
+            {pieData.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
 
-          <div className="bg-white p-4 shadow rounded text-green-600">
-            Completed: {
-              deliveries.filter(d => d.status === "completed").length
-            }
-          </div>
-
-          <div className="bg-white p-4 shadow rounded text-red-500">
-            Pending: {
-              deliveries.filter(d => d.status === "pending").length
-            }
-          </div>
-        </div>
-
-        {/* Upload */}
-        <UploadForm />
-
-        {/* Table */}
-        <div className="mt-6 bg-white p-4 shadow rounded">
-          <h2 className="font-bold mb-3">Deliveries</h2>
-
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th>ID</th>
-                <th>Status</th>
-                <th>Charges</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {deliveries.map((d, i) => (
-                <tr key={i} className="border-b">
-                  <td>{d.shipment_id}</td>
-                  <td>{d.status}</td>
-                  <td>₹{d.charges}</td>
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
+        {/* Bar Chart */}
+        <BarChart width={400} height={300} data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="shipment_id" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="charges" fill="#3b82f6" />
+        </BarChart>
 
       </div>
     </div>
