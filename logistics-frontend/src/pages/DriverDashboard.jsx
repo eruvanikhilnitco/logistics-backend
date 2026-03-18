@@ -16,7 +16,7 @@ export default function DriverDashboard() {
       .catch(err => console.log(err));
   }, []);
 
-  // ✅ Upload Function
+  // ✅ Upload Function (FIXED)
   const handleUpload = async (e) => {
     const files = e.target.files;
 
@@ -28,14 +28,20 @@ export default function DriverDashboard() {
     formData.append("email", "client@email.com");
 
     try {
-      await axios.post(
+      const res = await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
       );
 
+      console.log(res.data);
       alert("✅ Uploaded → processed via n8n");
     } catch (err) {
-      console.error(err);
+      console.error(err.response?.data || err.message);
       alert("❌ Upload failed");
     }
   };
@@ -55,7 +61,12 @@ export default function DriverDashboard() {
       <h1>🚚 Driver Dashboard</h1>
 
       {/* Stats */}
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+      <div style={{
+        display: "flex",
+        gap: "20px",
+        marginBottom: "20px",
+        fontWeight: "bold"
+      }}>
         <div>📦 Total: {data.length}</div>
         <div>✅ Completed: {completed}</div>
         <div>⏳ Pending: {pending}</div>
@@ -63,7 +74,12 @@ export default function DriverDashboard() {
       </div>
 
       {/* Upload Section */}
-      <div style={{ marginBottom: "30px" }}>
+      <div style={{
+        marginBottom: "30px",
+        padding: "15px",
+        border: "1px solid #ccc",
+        borderRadius: "10px"
+      }}>
         <h3>📤 Upload Invoice / Receipt</h3>
         <input type="file" multiple onChange={handleUpload} />
       </div>
