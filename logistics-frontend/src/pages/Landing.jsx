@@ -3,6 +3,14 @@ import { useNavigate } from "react-router-dom";
 export default function Landing() {
   const navigate = useNavigate();
 
+  const goToLogin = (role) => {
+    if (role) {
+      navigate(`/login?role=${role}`);
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -14,15 +22,15 @@ export default function Landing() {
 
         <div className="space-x-4">
           <button
-            onClick={() => navigate("/login?role=driver")}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={() => goToLogin("driver")}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Driver Login
           </button>
 
           <button
-            onClick={() => navigate("/login?role=client")}
-            className="px-4 py-2 bg-green-500 text-white rounded"
+            onClick={() => goToLogin("client")}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
             Client Login
           </button>
@@ -40,8 +48,8 @@ export default function Landing() {
         </p>
 
         <button
-          onClick={() => navigate("/login")}
-          className="bg-black text-white px-6 py-3 rounded-lg"
+          onClick={() => goToLogin()}
+          className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800"
         >
           Get Started
         </button>
