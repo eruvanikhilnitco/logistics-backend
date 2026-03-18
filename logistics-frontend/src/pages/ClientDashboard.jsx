@@ -5,7 +5,15 @@ export default function ClientDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get("https://logistics-backend-0zah.onrender.com/api/deliveries")
+    axios.get(
+      "https://logistics-backend-0zah.onrender.com/api/deliveries",
+      {
+        params: {
+          email: "client@test.com",
+          role: "client"
+        }
+      }
+    )
       .then(res => setData(res.data))
       .catch(err => console.log(err));
   }, []);
@@ -41,9 +49,8 @@ export default function ClientDashboard() {
         <p>Support</p>
       </div>
 
-      {/* Main Content */}
+      {/* Main */}
       <div style={{ flex: 1, padding: "30px", background: "#f3f4f6" }}>
-
         <h1>Client Dashboard</h1>
 
         {/* Stats */}
@@ -58,7 +65,7 @@ export default function ClientDashboard() {
           <Card title="Pending" value={pending} />
         </div>
 
-        {/* Delivery List */}
+        {/* List */}
         <div style={{
           marginTop: "30px",
           background: "white",
@@ -76,8 +83,7 @@ export default function ClientDashboard() {
               borderRadius: "8px",
               marginTop: "10px",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
+              justifyContent: "space-between"
             }}>
               <div>
                 <p><strong>ID:</strong> {d.shipment_id}</p>
@@ -85,26 +91,21 @@ export default function ClientDashboard() {
                 <p>Charges: ₹{d.charges}</p>
               </div>
 
-              <div>
-                <button
-                  style={{
-                    background: "#3b82f6",
-                    color: "white",
-                    padding: "8px 12px",
-                    borderRadius: "5px",
-                    border: "none",
-                    cursor: "pointer"
-                  }}
-                  onClick={() => alert("Calling Driver...")}
-                >
-                  📞 Call Driver
-                </button>
-              </div>
+              <button
+                style={{
+                  background: "#3b82f6",
+                  color: "white",
+                  padding: "8px 12px",
+                  borderRadius: "5px",
+                  border: "none"
+                }}
+                onClick={() => alert("Calling Driver...")}
+              >
+                📞 Call Driver
+              </button>
             </div>
           ))}
-
         </div>
-
       </div>
     </div>
   );

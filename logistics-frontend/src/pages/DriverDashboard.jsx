@@ -5,18 +5,25 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from "recharts";
 
-const COLORS = ["#22c55e", "#f59e0b", "#ef4444"];
+const COLORS = ["#22c55e", "#f59e0b"];
 
 export default function DriverDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get("https://logistics-backend-0zah.onrender.com/api/deliveries")
+    axios.get(
+      "https://logistics-backend-0zah.onrender.com/api/deliveries",
+      {
+        params: {
+          email: "driver@test.com",
+          role: "driver"
+        }
+      }
+    )
       .then(res => setData(res.data))
       .catch(err => console.log(err));
   }, []);
 
-  // ✅ Upload Function
   const handleUpload = async (e) => {
     const files = e.target.files;
 
@@ -25,10 +32,10 @@ export default function DriverDashboard() {
       formData.append("files", files[i]);
     }
 
-    formData.append("email", "client@email.com");
+    formData.append("email", "client@test.com");
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
         formData,
         {
@@ -38,15 +45,13 @@ export default function DriverDashboard() {
         }
       );
 
-      console.log(res.data);
       alert("✅ Uploaded → processed via n8n");
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      console.error(err);
       alert("❌ Upload failed");
     }
   };
 
-  // ✅ Stats
   const completed = data.filter(d => d.status === "completed").length;
   const pending = data.filter(d => d.status === "pending").length;
   const totalRevenue = data.reduce((acc, d) => acc + d.charges, 0);
@@ -56,13 +61,11 @@ export default function DriverDashboard() {
     { name: "Pending", value: pending }
   ];
 
-  // ✅ Card Component
   const Card = ({ title, value }) => (
     <div style={{
       background: "white",
       padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+      borderRadius: "10px"
     }}>
       <h4>{title}</h4>
       <h2>{value}</h2>
@@ -70,7 +73,7 @@ export default function DriverDashboard() {
   );
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh" }}>
 
       {/* Sidebar */}
       <div style={{
@@ -80,12 +83,11 @@ export default function DriverDashboard() {
         padding: "20px"
       }}>
         <h2>🚚 AutoLogix</h2>
-        <p style={{ marginTop: "20px" }}>Dashboard</p>
+        <p>Dashboard</p>
         <p>Upload</p>
-        <p>History</p>
       </div>
 
-      {/* Main Content */}
+      {/* Main */}
       <div style={{ flex: 1, padding: "30px", background: "#f3f4f6" }}>
 
         <h1>Driver Dashboard</h1>
@@ -94,8 +96,7 @@ export default function DriverDashboard() {
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
-          marginTop: "20px"
+          gap: "20px"
         }}>
           <Card title="Total" value={data.length} />
           <Card title="Completed" value={completed} />
@@ -104,56 +105,30 @@ export default function DriverDashboard() {
         </div>
 
         {/* Upload */}
-        <div style={{
-          marginTop: "30px",
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px"
-        }}>
-          <h3>📤 Upload Invoice / Receipt</h3>
+        <div style={{ marginTop: "20px", background: "white", padding: "20px" }}>
           <input type="file" multiple onChange={handleUpload} />
         </div>
 
         {/* Charts */}
-        <div style={{
-          display: "flex",
-          gap: "40px",
-          marginTop: "30px"
-        }}>
+        <div style={{ display: "flex", gap: "40px", marginTop: "30px" }}>
 
-          {/* Pie */}
-          <div style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
-            <PieChart width={300} height={300}>
-              <Pie data={pieData} dataKey="value">
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </div>
+          <PieChart width={300} height={300}>
+            <Pie data={pieData} dataKey="value">
+              {pieData.map((entry, index) => (
+                <Cell key={index} fill={COLORS[index]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
 
-          {/* Bar */}
-          <div style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
-            <BarChart width={400} height={300} data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="shipment_id" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="charges" fill="#3b82f6" />
-            </BarChart>
-          </div>
+          <BarChart width={400} height={300} data={data}>
+            <XAxis dataKey="shipment_id" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="charges" fill="#3b82f6" />
+          </BarChart>
 
         </div>
-
       </div>
     </div>
   );
