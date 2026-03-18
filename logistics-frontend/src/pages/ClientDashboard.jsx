@@ -5,11 +5,13 @@ export default function ClientDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
+    const email = localStorage.getItem("email"); // ✅ from login
+
     axios.get(
       "https://logistics-backend-0zah.onrender.com/api/deliveries",
       {
         params: {
-          email: "client@test.com",
+          email: email,
           role: "client"
         }
       }
@@ -97,7 +99,8 @@ export default function ClientDashboard() {
                   color: "white",
                   padding: "8px 12px",
                   borderRadius: "5px",
-                  border: "none"
+                  border: "none",
+                  cursor: "pointer"
                 }}
                 onClick={() => alert("Calling Driver...")}
               >

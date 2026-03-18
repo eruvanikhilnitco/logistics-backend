@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import DriverDashboard from "./pages/DriverDashboard";
-import ClientDashboard from "./pages/ClientDashboard"; // ✅ added
+import ClientDashboard from "./pages/ClientDashboard";
+import Login from "./pages/Login"; // ✅ added
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} /> {/* ✅ added */}
         <Route path="/driver" element={<DriverDashboard />} />
-        <Route path="/client" element={<ClientDashboard />} /> {/* ✅ added */}
+        <Route path="/client" element={<ClientDashboard />} />
       </Routes>
     </BrowserRouter>
   );

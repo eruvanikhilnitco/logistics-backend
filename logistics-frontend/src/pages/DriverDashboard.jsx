@@ -11,11 +11,13 @@ export default function DriverDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
+    const email = localStorage.getItem("email"); // ✅ from login
+
     axios.get(
       "https://logistics-backend-0zah.onrender.com/api/deliveries",
       {
         params: {
-          email: "driver@test.com",
+          email: email,
           role: "driver"
         }
       }
@@ -32,7 +34,9 @@ export default function DriverDashboard() {
       formData.append("files", files[i]);
     }
 
-    formData.append("email", "client@test.com");
+    const email = localStorage.getItem("email"); // ✅ dynamic
+
+    formData.append("email", email);
 
     try {
       await axios.post(
@@ -65,7 +69,8 @@ export default function DriverDashboard() {
     <div style={{
       background: "white",
       padding: "20px",
-      borderRadius: "10px"
+      borderRadius: "10px",
+      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
     }}>
       <h4>{title}</h4>
       <h2>{value}</h2>
@@ -73,7 +78,7 @@ export default function DriverDashboard() {
   );
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh", fontFamily: "sans-serif" }}>
 
       {/* Sidebar */}
       <div style={{
@@ -105,30 +110,52 @@ export default function DriverDashboard() {
         </div>
 
         {/* Upload */}
-        <div style={{ marginTop: "20px", background: "white", padding: "20px" }}>
+        <div style={{
+          marginTop: "20px",
+          background: "white",
+          padding: "20px",
+          borderRadius: "10px"
+        }}>
+          <h3>📤 Upload Invoice / Receipt</h3>
           <input type="file" multiple onChange={handleUpload} />
         </div>
 
         {/* Charts */}
         <div style={{ display: "flex", gap: "40px", marginTop: "30px" }}>
 
-          <PieChart width={300} height={300}>
-            <Pie data={pieData} dataKey="value">
-              {pieData.map((entry, index) => (
-                <Cell key={index} fill={COLORS[index]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
+          {/* Pie */}
+          <div style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px"
+          }}>
+            <PieChart width={300} height={300}>
+              <Pie data={pieData} dataKey="value">
+                {pieData.map((entry, index) => (
+                  <Cell key={index} fill={COLORS[index]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </div>
 
-          <BarChart width={400} height={300} data={data}>
-            <XAxis dataKey="shipment_id" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="charges" fill="#3b82f6" />
-          </BarChart>
+          {/* Bar */}
+          <div style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px"
+          }}>
+            <BarChart width={400} height={300} data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="shipment_id" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="charges" fill="#3b82f6" />
+            </BarChart>
+          </div>
 
         </div>
+
       </div>
     </div>
   );
