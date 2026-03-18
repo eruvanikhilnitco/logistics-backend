@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import uploadRoutes from "./routes/upload.js";
-import { createClient } from "@supabase/supabase-js"; // ✅ ADDED
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 
@@ -19,12 +19,21 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Routes
 app.use("/api/upload", uploadRoutes);
 
-// ✅ Deliveries API (NOW REAL DATA)
+// ✅ Deliveries API (FILTERED BY USER)
 app.get("/api/deliveries", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("deliveries")
-      .select("*");
+    const { email, role } = req.query;
+
+    let query = supabase.from("deliveries").select("*");
+
+    // 🔥 FILTER LOGIC
+    if (role === "driver") {
+      query = query.eq("driver_email", email);
+    } else if (role === "client") {
+      query = query.eq("client_email", email);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
