@@ -1,16 +1,30 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import uploadRoutes from "./routes/upload.js";
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-const uploadRoute = require("./routes/upload");
-app.use("/api", uploadRoute);
+// existing route
+app.use("/api/upload", uploadRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Backend Running 🚀");
+// 👇 ADD THIS BLOCK HERE
+app.get("/api/deliveries", async (req, res) => {
+  try {
+    const data = [
+      { shipment_id: "123", status: "completed", charges: 500 },
+      { shipment_id: "124", status: "pending", charges: 300 }
+    ];
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// server start
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
