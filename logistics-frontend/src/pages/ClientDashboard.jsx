@@ -5,110 +5,113 @@ export default function ClientDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const email = localStorage.getItem("email"); // ✅ from login
+    const email = localStorage.getItem("email");
 
     axios.get(
       "https://logistics-backend-0zah.onrender.com/api/deliveries",
       {
-        params: {
-          email: email,
-          role: "client"
-        }
+        params: { email, role: "client" }
       }
     )
       .then(res => setData(res.data))
-      .catch(err => console.log(err));
+      .catch(console.log);
   }, []);
 
   const completed = data.filter(d => d.status === "completed").length;
   const pending = data.filter(d => d.status === "pending").length;
 
-  const Card = ({ title, value }) => (
-    <div style={{
-      background: "white",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-    }}>
-      <h4>{title}</h4>
-      <h2>{value}</h2>
-    </div>
-  );
-
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "sans-serif" }}>
+    <div className="flex min-h-screen bg-slate-900 text-white">
 
-      {/* Sidebar */}
-      <div style={{
-        width: "220px",
-        background: "#111827",
-        color: "white",
-        padding: "20px"
-      }}>
-        <h2>📦 AutoLogix</h2>
-        <p style={{ marginTop: "20px" }}>My Deliveries</p>
-        <p>Track</p>
-        <p>Support</p>
+      {/* 🔥 Sidebar */}
+      <div className="w-64 sidebar p-6">
+        <h2 className="text-xl font-bold text-cyan-400 mb-6">
+          AutoLogix 📦
+        </h2>
+
+        <div className="space-y-3 text-slate-400">
+          <p className="hover:text-white cursor-pointer">My Deliveries</p>
+          <p className="hover:text-white cursor-pointer">Track</p>
+          <p className="hover:text-white cursor-pointer">Support</p>
+        </div>
       </div>
 
-      {/* Main */}
-      <div style={{ flex: 1, padding: "30px", background: "#f3f4f6" }}>
-        <h1>Client Dashboard</h1>
+      {/* 🔥 Main */}
+      <div className="flex-1 p-8">
 
-        {/* Stats */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "20px",
-          marginTop: "20px"
-        }}>
-          <Card title="Total Deliveries" value={data.length} />
-          <Card title="Completed" value={completed} />
-          <Card title="Pending" value={pending} />
+        <h1 className="text-3xl font-bold mb-6">
+          Client Dashboard
+        </h1>
+
+        {/* 🔥 Stats */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+
+          <div className="card">
+            <p className="subtext">Total Deliveries</p>
+            <h2 className="text-2xl">{data.length}</h2>
+          </div>
+
+          <div className="card">
+            <p className="subtext">Completed</p>
+            <h2 className="text-2xl text-green-400">{completed}</h2>
+          </div>
+
+          <div className="card">
+            <p className="subtext">Pending</p>
+            <h2 className="text-2xl text-yellow-400">{pending}</h2>
+          </div>
+
         </div>
 
-        {/* List */}
-        <div style={{
-          marginTop: "30px",
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px"
-        }}>
-          <h3>📋 Delivery Details</h3>
+        {/* 🔥 Delivery List */}
+        <div className="section">
+          <h3 className="mb-4 font-semibold">Delivery Details</h3>
 
-          {data.length === 0 && <p>No deliveries found</p>}
+          {data.length === 0 && (
+            <p className="text-slate-500">No deliveries found</p>
+          )}
 
-          {data.map((d, index) => (
-            <div key={index} style={{
-              border: "1px solid #ddd",
-              padding: "15px",
-              borderRadius: "8px",
-              marginTop: "10px",
-              display: "flex",
-              justifyContent: "space-between"
-            }}>
-              <div>
-                <p><strong>ID:</strong> {d.shipment_id}</p>
-                <p>Status: {d.status}</p>
-                <p>Charges: ₹{d.charges}</p>
-              </div>
-
-              <button
-                style={{
-                  background: "#3b82f6",
-                  color: "white",
-                  padding: "8px 12px",
-                  borderRadius: "5px",
-                  border: "none",
-                  cursor: "pointer"
-                }}
-                onClick={() => alert("Calling Driver...")}
+          <div className="space-y-4">
+            {data.map((d, index) => (
+              <div
+                key={index}
+                className="bg-slate-800 p-4 rounded-xl flex justify-between items-center hover:scale-[1.01]"
               >
-                📞 Call Driver
-              </button>
-            </div>
-          ))}
+                <div>
+                  <p className="text-sm text-slate-400">
+                    Shipment ID
+                  </p>
+                  <p className="font-semibold">{d.shipment_id}</p>
+
+                  <p className="text-sm mt-2">
+                    Status:{" "}
+                    <span
+                      className={
+                        d.status === "completed"
+                          ? "text-green-400"
+                          : "text-yellow-400"
+                      }
+                    >
+                      {d.status}
+                    </span>
+                  </p>
+
+                  <p className="text-sm text-slate-400">
+                    ₹{d.charges}
+                  </p>
+                </div>
+
+                <button
+                  className="btn-primary"
+                  onClick={() => alert("Calling Driver...")}
+                >
+                  📞 Call
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );

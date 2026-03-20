@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 🔥 Global Theme */
+body {
+  @apply bg-slate-900 text-slate-200;
+  font-family: 'Inter', sans-serif;
+}
+
+/* 🔥 Smooth UI */
+* {
+  @apply transition-all duration-200;
+}
+
+/* 🔥 Buttons */
+.btn-primary {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700;
+}
+
+.btn-secondary {
+  @apply bg-cyan-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600;
+}
+
+/* 🔥 Accent (RED CTA like your reference) */
+.btn-accent {
+  background: linear-gradient(135deg, #FF2D55, #FF4D6D);
+  @apply text-white px-5 py-2 rounded-lg;
+}
+
+/* 🔥 Cards */
+.card {
+  @apply bg-slate-800 p-5 rounded-xl shadow-lg;
+}
+
+/* 🔥 Section Container */
+.section {
+  @apply bg-slate-800 p-6 rounded-xl;
+}
+
+/* 🔥 Inputs */
+.input {
+  @apply w-full p-2 rounded-md bg-slate-900 border border-slate-700 text-white;
+}
+
+/* 🔥 Sidebar */
+.sidebar {
+  @apply bg-slate-950 text-white border-r border-slate-800;
+}
+
+/* 🔥 Gradient Background (Landing Hero) */
+.hero-gradient {
+  background: linear-gradient(135deg, #0F172A, #1E293B);
+}
+
+/* 🔥 CTA Gradient (IMPORTANT — your missing color) */
+.cta-gradient {
+  background: linear-gradient(135deg, #FF2D55, #FF4D6D);
+}
+
+/* 🔥 Text Styles */
+.heading {
+  @apply text-3xl font-bold;
+}
+
+.subtext {
+  @apply text-slate-400;
+}

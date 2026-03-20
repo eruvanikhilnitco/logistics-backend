@@ -5,152 +5,135 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from "recharts";
 
-const COLORS = ["#22c55e", "#f59e0b"];
+const COLORS = ["#22C55E", "#F59E0B"];
 
 export default function DriverDashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const email = localStorage.getItem("email"); // ✅ from login
+    const email = localStorage.getItem("email");
 
     axios.get(
       "https://logistics-backend-0zah.onrender.com/api/deliveries",
       {
-        params: {
-          email: email,
-          role: "driver"
-        }
+        params: { email, role: "driver" }
       }
     )
       .then(res => setData(res.data))
-      .catch(err => console.log(err));
+      .catch(console.log);
   }, []);
 
   const handleUpload = async (e) => {
     const files = e.target.files;
-
     const formData = new FormData();
+
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i]);
     }
 
-    const email = localStorage.getItem("email"); // ✅ dynamic
-
+    const email = localStorage.getItem("email");
     formData.append("email", email);
 
     try {
       await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
+        formData
       );
-
-      alert("✅ Uploaded → processed via n8n");
-    } catch (err) {
-      console.error(err);
+      alert("✅ Uploaded");
+    } catch {
       alert("❌ Upload failed");
     }
   };
 
   const completed = data.filter(d => d.status === "completed").length;
   const pending = data.filter(d => d.status === "pending").length;
-  const totalRevenue = data.reduce((acc, d) => acc + d.charges, 0);
+  const revenue = data.reduce((a, b) => a + b.charges, 0);
 
   const pieData = [
     { name: "Completed", value: completed },
     { name: "Pending", value: pending }
   ];
 
-  const Card = ({ title, value }) => (
-    <div style={{
-      background: "white",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-    }}>
-      <h4>{title}</h4>
-      <h2>{value}</h2>
-    </div>
-  );
-
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "sans-serif" }}>
+    <div className="flex min-h-screen bg-slate-900 text-white">
 
-      {/* Sidebar */}
-      <div style={{
-        width: "220px",
-        background: "#111827",
-        color: "white",
-        padding: "20px"
-      }}>
-        <h2>🚚 AutoLogix</h2>
-        <p>Dashboard</p>
-        <p>Upload</p>
+      {/* 🔥 Sidebar */}
+      <div className="w-64 sidebar p-6">
+        <h2 className="text-xl font-bold text-indigo-400 mb-6">
+          AutoLogix 🚚
+        </h2>
+
+        <div className="space-y-3 text-slate-400">
+          <p className="hover:text-white cursor-pointer">Dashboard</p>
+          <p className="hover:text-white cursor-pointer">Upload</p>
+          <p className="hover:text-white cursor-pointer">History</p>
+        </div>
       </div>
 
-      {/* Main */}
-      <div style={{ flex: 1, padding: "30px", background: "#f3f4f6" }}>
+      {/* 🔥 Main */}
+      <div className="flex-1 p-8">
 
-        <h1>Driver Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6">
+          Driver Dashboard
+        </h1>
 
-        {/* Cards */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px"
-        }}>
-          <Card title="Total" value={data.length} />
-          <Card title="Completed" value={completed} />
-          <Card title="Pending" value={pending} />
-          <Card title="Revenue" value={`₹${totalRevenue}`} />
+        {/* 🔥 Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+
+          <div className="card">
+            <p className="subtext">Total</p>
+            <h2 className="text-2xl">{data.length}</h2>
+          </div>
+
+          <div className="card">
+            <p className="subtext">Completed</p>
+            <h2 className="text-2xl text-green-400">{completed}</h2>
+          </div>
+
+          <div className="card">
+            <p className="subtext">Pending</p>
+            <h2 className="text-2xl text-yellow-400">{pending}</h2>
+          </div>
+
+          <div className="card">
+            <p className="subtext">Revenue</p>
+            <h2 className="text-2xl text-indigo-400">₹{revenue}</h2>
+          </div>
+
         </div>
 
-        {/* Upload */}
-        <div style={{
-          marginTop: "20px",
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px"
-        }}>
-          <h3>📤 Upload Invoice / Receipt</h3>
-          <input type="file" multiple onChange={handleUpload} />
+        {/* 🔥 Upload */}
+        <div className="section mb-8">
+          <h3 className="mb-3 font-semibold">Upload Documents</h3>
+          <input
+            type="file"
+            multiple
+            onChange={handleUpload}
+            className="text-sm"
+          />
         </div>
 
-        {/* Charts */}
-        <div style={{ display: "flex", gap: "40px", marginTop: "30px" }}>
+        {/* 🔥 Charts */}
+        <div className="grid md:grid-cols-2 gap-6">
 
-          {/* Pie */}
-          <div style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
+          <div className="card flex justify-center">
             <PieChart width={300} height={300}>
               <Pie data={pieData} dataKey="value">
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
+                {pieData.map((entry, i) => (
+                  <Cell key={i} fill={COLORS[i]} />
                 ))}
               </Pie>
               <Tooltip />
             </PieChart>
           </div>
 
-          {/* Bar */}
-          <div style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
+          <div className="card">
             <BarChart width={400} height={300} data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="shipment_id" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="charges" fill="#3b82f6" />
+              <Bar dataKey="charges" fill="#4F46E5" />
             </BarChart>
           </div>
 

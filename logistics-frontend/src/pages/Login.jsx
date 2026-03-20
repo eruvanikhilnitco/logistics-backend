@@ -8,98 +8,88 @@ export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // ✅ Auto-set role from URL
   useEffect(() => {
     const roleFromURL = searchParams.get("role");
-    if (roleFromURL) {
-      setRole(roleFromURL);
-    }
+    if (roleFromURL) setRole(roleFromURL);
   }, []);
 
   const handleLogin = () => {
-    if (!email) {
-      alert("Please enter email");
-      return;
-    }
+    if (!email) return alert("Enter email");
 
-    // ✅ Save user info
     localStorage.setItem("email", email);
     localStorage.setItem("role", role);
 
-    // ✅ Redirect based on role
-    if (role === "driver") {
-      navigate("/driver");
-    } else {
-      navigate("/client");
-    }
+    navigate(role === "driver" ? "/driver" : "/client");
   };
 
   return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#f3f4f6",
-      fontFamily: "sans-serif"
-    }}>
+    <div className="min-h-screen flex items-center justify-center hero-gradient">
 
-      <div style={{
-        background: "white",
-        padding: "30px",
-        borderRadius: "10px",
-        width: "300px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-      }}>
+      {/* Card */}
+      <div className="card w-[380px] backdrop-blur-xl">
 
-        <h2 style={{ marginBottom: "20px" }}>Login</h2>
+        {/* Logo */}
+        <h1 className="text-2xl font-bold text-center text-indigo-400 mb-2">
+          AutoLogix 🚚
+        </h1>
+
+        <p className="text-center text-slate-400 mb-6">
+          AI Logistics Platform
+        </p>
 
         {/* Email */}
-        <input
-          type="email"
-          placeholder="Enter email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "15px",
-            border: "1px solid #ccc",
-            borderRadius: "5px"
-          }}
-        />
+        <div className="mb-4">
+          <label className="text-sm text-slate-400">Email</label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="input mt-1"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
-        {/* Role */}
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "20px",
-            borderRadius: "5px"
-          }}
-        >
-          <option value="driver">Driver</option>
-          <option value="client">Client</option>
-        </select>
+        {/* Role Toggle */}
+        <div className="mb-6">
+          <label className="text-sm text-slate-400">Select Role</label>
 
-        {/* Button */}
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => setRole("driver")}
+              className={`flex-1 py-2 rounded-lg ${
+                role === "driver"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-700 text-slate-300"
+              }`}
+            >
+              Driver
+            </button>
+
+            <button
+              onClick={() => setRole("client")}
+              className={`flex-1 py-2 rounded-lg ${
+                role === "client"
+                  ? "bg-cyan-500 text-white"
+                  : "bg-slate-700 text-slate-300"
+              }`}
+            >
+              Client
+            </button>
+          </div>
+        </div>
+
+        {/* Login Button */}
         <button
           onClick={handleLogin}
-          style={{
-            width: "100%",
-            padding: "10px",
-            background: "#3b82f6",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer"
-          }}
+          className="btn-accent w-full"
         >
-          Login
+          Login →
         </button>
 
+        {/* Footer */}
+        <p className="text-center text-xs text-slate-500 mt-6">
+          Powered by AI Automation
+        </p>
       </div>
     </div>
   );
