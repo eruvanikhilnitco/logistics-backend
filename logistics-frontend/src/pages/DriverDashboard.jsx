@@ -16,7 +16,6 @@ export default function DriverDashboard() {
   const email = localStorage.getItem("email");
   const name = localStorage.getItem("name");
 
-  // ✅ FETCH DATA
   const fetchData = async () => {
     try {
       const res = await axios.get(
@@ -33,14 +32,12 @@ export default function DriverDashboard() {
     }
   };
 
-  // 🔥 AUTO REFRESH EVERY 5s
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ UPLOAD (FINAL FIX)
   const handleUpload = async (e) => {
     const files = e.target.files;
 
@@ -55,8 +52,6 @@ export default function DriverDashboard() {
       formData.append("files", files[i]);
     }
 
-    // 🔥 DRIVER EMAIL (MAIN FIX)
-    console.log("Sending driver_email:", email); // debug
     formData.append("driver_email", email);
 
     try {
@@ -68,10 +63,8 @@ export default function DriverDashboard() {
       );
 
       toast.success("Uploaded successfully 🚀");
-
-      fetchData(); // instant refresh
-    } catch (err) {
-      console.error(err);
+      fetchData();
+    } catch {
       toast.error("Upload failed ❌");
     } finally {
       setUploading(false);
@@ -87,7 +80,6 @@ export default function DriverDashboard() {
     { name: "Pending", value: pending }
   ];
 
-  // ✅ LOADING
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
@@ -105,16 +97,27 @@ export default function DriverDashboard() {
           AutoLogix 🚚
         </h2>
 
-        <div className="space-y-3 text-slate-400">
-          <button onClick={() => document.getElementById("dashboard").scrollIntoView()} className="hover:text-white">
+        {/* ✅ FIXED SIDEBAR */}
+        <div className="flex flex-col gap-3 text-slate-400">
+
+          <button
+            onClick={() => document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" })}
+            className="text-left hover:text-white"
+          >
             Dashboard
           </button>
 
-          <button onClick={() => document.getElementById("upload").scrollIntoView()} className="hover:text-white">
+          <button
+            onClick={() => document.getElementById("upload").scrollIntoView({ behavior: "smooth" })}
+            className="text-left hover:text-white"
+          >
             Upload
           </button>
 
-          <button onClick={() => document.getElementById("history").scrollIntoView()} className="hover:text-white">
+          <button
+            onClick={() => document.getElementById("history").scrollIntoView({ behavior: "smooth" })}
+            className="text-left hover:text-white"
+          >
             History
           </button>
 
@@ -123,10 +126,11 @@ export default function DriverDashboard() {
               localStorage.clear();
               window.location.href = "/";
             }}
-            className="text-red-400 mt-6 hover:text-red-500"
+            className="text-red-400 mt-6 hover:text-red-500 text-left"
           >
             Logout
           </button>
+
         </div>
       </div>
 
@@ -143,6 +147,7 @@ export default function DriverDashboard() {
 
         {/* Stats */}
         <div id="dashboard" className="grid md:grid-cols-4 gap-6 mb-8">
+
           <div className="card">
             <p className="subtext">Total</p>
             <h2 className="text-2xl">{data.length}</h2>
@@ -162,6 +167,7 @@ export default function DriverDashboard() {
             <p className="subtext">Revenue</p>
             <h2 className="text-2xl text-indigo-400">₹{revenue}</h2>
           </div>
+
         </div>
 
         {/* Upload */}
@@ -178,14 +184,15 @@ export default function DriverDashboard() {
         {/* Charts */}
         <div id="history" className="grid md:grid-cols-2 gap-6">
 
+          {/* ✅ FIXED PIE */}
           <div className="card">
             <h3 className="mb-4 font-semibold">
               Delivery Status Overview
             </h3>
 
-            {data.length === 0 ? (
+            {completed === 0 && pending === 0 ? (
               <div className="h-[300px] flex items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded">
-                No data yet (Upload invoices)
+                No delivery status data yet
               </div>
             ) : (
               <PieChart width={300} height={300}>
@@ -199,6 +206,7 @@ export default function DriverDashboard() {
             )}
           </div>
 
+          {/* BAR */}
           <div className="card">
             <h3 className="mb-4 font-semibold">
               Revenue per Shipment
