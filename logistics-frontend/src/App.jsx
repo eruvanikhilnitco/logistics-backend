@@ -3,13 +3,14 @@ import Landing from "./pages/Landing";
 import DriverDashboard from "./pages/DriverDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup"; // ✅ NEW
 
-// ✅ Simple Auth Check (temporary)
+// ✅ Auth Check
 const isAuthenticated = () => {
-  return localStorage.getItem("role"); // driver / client
+  return localStorage.getItem("role");
 };
 
-// ✅ Protected Route Wrapper
+// ✅ Protected Route
 const ProtectedRoute = ({ children, role }) => {
   const userRole = localStorage.getItem("role");
 
@@ -29,11 +30,12 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Public */}
+        {/* ✅ Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} /> {/* ✅ NEW */}
 
-        {/* Protected */}
+        {/* ✅ Protected */}
         <Route
           path="/driver"
           element={
@@ -52,7 +54,7 @@ function App() {
           }
         />
 
-        {/* Fallback */}
+        {/* ✅ Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
 
       </Routes>

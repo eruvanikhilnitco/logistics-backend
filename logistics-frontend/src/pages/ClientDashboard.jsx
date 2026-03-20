@@ -6,18 +6,28 @@ export default function ClientDashboard() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const email = localStorage.getItem("email");
+  const email = localStorage.getItem("email");
+  const name = localStorage.getItem("name");
 
-    axios.get(
-      "https://logistics-backend-0zah.onrender.com/api/deliveries",
-      {
-        params: { email, role: "client" }
-      }
-    )
-      .then(res => setData(res.data))
-      .catch(() => toast.error("Failed to load deliveries"))
-      .finally(() => setLoading(false));
+  // ✅ FETCH FUNCTION
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        "https://logistics-backend-0zah.onrender.com/api/deliveries",
+        {
+          params: { email, role: "client" }
+        }
+      );
+      setData(res.data);
+    } catch {
+      toast.error("Failed to load deliveries");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const completed = data.filter(d => d.status === "completed").length;
@@ -43,31 +53,27 @@ export default function ClientDashboard() {
 
         <div className="space-y-3 text-slate-400">
 
-          <button
-            onClick={() =>
-              document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("dashboard").scrollIntoView()}>
             Dashboard
           </button>
 
-          <button
-            onClick={() =>
-              document.getElementById("deliveries").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("deliveries").scrollIntoView()}>
             My Deliveries
           </button>
 
-          <button
-            onClick={() =>
-              document.getElementById("support").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("support").scrollIntoView()}>
             Support
+          </button>
+
+          {/* 🔥 LOGOUT */}
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/";
+            }}
+            className="text-red-400 mt-6 hover:text-red-500"
+          >
+            Logout
           </button>
 
         </div>
@@ -76,15 +82,19 @@ export default function ClientDashboard() {
       {/* 🔥 Main */}
       <div className="flex-1 p-8">
 
-        {/* ✅ Dashboard */}
-        <div id="dashboard">
-          <h1 className="text-3xl font-bold mb-6">
+        {/* 🔥 Navbar */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">
             Client Dashboard
           </h1>
+
+          <div className="text-sm text-slate-400">
+            👤 {name}
+          </div>
         </div>
 
         {/* 🔥 Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div id="dashboard" className="grid md:grid-cols-3 gap-6 mb-8">
 
           <div className="card">
             <p className="subtext">Total Deliveries</p>
@@ -103,7 +113,7 @@ export default function ClientDashboard() {
 
         </div>
 
-        {/* ✅ Deliveries */}
+        {/* 🔥 Deliveries */}
         <div id="deliveries" className="section mb-8">
           <h3 className="mb-4 font-semibold">Delivery Details</h3>
 
@@ -152,12 +162,12 @@ export default function ClientDashboard() {
           )}
         </div>
 
-        {/* ✅ Support */}
+        {/* 🔥 Support */}
         <div id="support" className="section">
           <h3 className="mb-4 font-semibold">Support</h3>
 
           <p className="text-slate-400">
-            Need help? Contact your driver or reach support.
+            Need help? Contact your driver or support team.
           </p>
         </div>
 

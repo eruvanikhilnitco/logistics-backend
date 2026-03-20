@@ -13,20 +13,31 @@ export default function DriverDashboard() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    const email = localStorage.getItem("email");
+  const email = localStorage.getItem("email");
+  const name = localStorage.getItem("name");
 
-    axios.get(
-      "https://logistics-backend-0zah.onrender.com/api/deliveries",
-      {
-        params: { email, role: "driver" }
-      }
-    )
-      .then(res => setData(res.data))
-      .catch(() => toast.error("Failed to load data"))
-      .finally(() => setLoading(false));
+  // ✅ FETCH DATA
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        "https://logistics-backend-0zah.onrender.com/api/deliveries",
+        {
+          params: { email, role: "driver" }
+        }
+      );
+      setData(res.data);
+    } catch {
+      toast.error("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
+  // ✅ UPLOAD (FIXED)
   const handleUpload = async (e) => {
     const files = e.target.files;
     const formData = new FormData();
@@ -35,18 +46,25 @@ export default function DriverDashboard() {
       formData.append("files", files[i]);
     }
 
-    const email = localStorage.getItem("email");
-    formData.append("email", email);
+    // 🔥 ONLY DRIVER EMAIL (CORRECT ARCHITECTURE)
+    formData.append("driver_email", email);
 
     try {
       setUploading(true);
 
       await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
       );
 
       toast.success("Uploaded successfully 🚀");
+
+      fetchData(); // refresh
     } catch {
       toast.error("Upload failed ❌");
     } finally {
@@ -63,7 +81,7 @@ export default function DriverDashboard() {
     { name: "Pending", value: pending }
   ];
 
-  // ✅ LOADING SCREEN
+  // ✅ LOADING
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
@@ -75,56 +93,50 @@ export default function DriverDashboard() {
   return (
     <div className="flex min-h-screen bg-slate-900 text-white">
 
-      {/* 🔥 Sidebar */}
+      {/* Sidebar */}
       <div className="w-64 sidebar p-6">
         <h2 className="text-xl font-bold text-indigo-400 mb-6">
           AutoLogix 🚚
         </h2>
 
         <div className="space-y-3 text-slate-400">
-
-          <button
-            onClick={() =>
-              document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("dashboard").scrollIntoView()} className="hover:text-white">
             Dashboard
           </button>
 
-          <button
-            onClick={() =>
-              document.getElementById("upload").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("upload").scrollIntoView()} className="hover:text-white">
             Upload
           </button>
 
-          <button
-            onClick={() =>
-              document.getElementById("history").scrollIntoView({ behavior: "smooth" })
-            }
-            className="block hover:text-white"
-          >
+          <button onClick={() => document.getElementById("history").scrollIntoView()} className="hover:text-white">
             History
           </button>
 
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/";
+            }}
+            className="text-red-400 mt-6 hover:text-red-500"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
-      {/* 🔥 Main */}
+      {/* Main */}
       <div className="flex-1 p-8">
 
-        {/* Dashboard */}
-        <div id="dashboard">
-          <h1 className="text-3xl font-bold mb-6">
-            Driver Dashboard
-          </h1>
+        {/* Navbar */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Driver Dashboard</h1>
+          <div className="text-sm text-slate-400">
+            👤 {name}
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div id="dashboard" className="grid md:grid-cols-4 gap-6 mb-8">
 
           <div className="card">
             <p className="subtext">Total</p>
@@ -162,7 +174,6 @@ export default function DriverDashboard() {
         {/* Charts */}
         <div id="history" className="grid md:grid-cols-2 gap-6">
 
-          {/* PIE */}
           <div className="card">
             <h3 className="mb-4 font-semibold">
               Delivery Status Overview
@@ -170,7 +181,7 @@ export default function DriverDashboard() {
 
             {data.length === 0 ? (
               <div className="h-[300px] flex items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded">
-                No data yet (Upload invoices to generate insights)
+                No data yet (Upload invoices)
               </div>
             ) : (
               <PieChart width={300} height={300}>
@@ -184,7 +195,6 @@ export default function DriverDashboard() {
             )}
           </div>
 
-          {/* BAR */}
           <div className="card">
             <h3 className="mb-4 font-semibold">
               Revenue per Shipment
@@ -192,7 +202,7 @@ export default function DriverDashboard() {
 
             {data.length === 0 ? (
               <div className="h-[300px] flex items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded">
-                No revenue data available
+                No revenue data
               </div>
             ) : (
               <BarChart width={400} height={300} data={data}>

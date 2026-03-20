@@ -1,54 +1,55 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-export default function Login() {
+export default function Signup() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("driver");
-  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    const roleFromURL = searchParams.get("role");
-    if (roleFromURL) setRole(roleFromURL);
-  }, []);
-
-  const handleLogin = () => {
-    if (!email) {
-      toast.error("Please enter email");
-      return;
+  const handleSignup = () => {
+    if (!name || !email) {
+      return toast.error("All fields required");
     }
 
-    setLoading(true);
-
-    // ✅ Save user info
+    // ✅ Store user info
+    localStorage.setItem("name", name);
     localStorage.setItem("email", email);
     localStorage.setItem("role", role);
-    localStorage.setItem("name", email.split("@")[0]); // 🔥 for navbar
 
-    toast.success("Login successful 🚀");
+    toast.success("Signup successful 🚀");
 
-    setTimeout(() => {
-      navigate(role === "driver" ? "/driver" : "/client");
-    }, 500);
+    // ✅ Redirect to dashboard directly (better UX)
+    navigate(role === "driver" ? "/driver" : "/client");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center hero-gradient">
 
-      {/* Card */}
       <div className="card w-[380px] backdrop-blur-xl">
 
-        {/* Logo */}
+        {/* Title */}
         <h1 className="text-2xl font-bold text-center text-indigo-400 mb-2">
-          AutoLogix 🚚
+          Create Account 🚀
         </h1>
 
         <p className="text-center text-slate-400 mb-6">
-          AI Logistics Platform
+          Join AutoLogix Platform
         </p>
+
+        {/* Name */}
+        <div className="mb-4">
+          <label className="text-sm text-slate-400">Name</label>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            className="input mt-1"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
 
         {/* Email */}
         <div className="mb-4">
@@ -62,14 +63,14 @@ export default function Login() {
           />
         </div>
 
-        {/* Role Toggle */}
+        {/* Role */}
         <div className="mb-6">
           <label className="text-sm text-slate-400">Select Role</label>
 
           <div className="flex gap-2 mt-2">
             <button
               onClick={() => setRole("driver")}
-              className={`flex-1 py-2 rounded-lg transition ${
+              className={`flex-1 py-2 rounded-lg ${
                 role === "driver"
                   ? "bg-indigo-600 text-white"
                   : "bg-slate-700 text-slate-300"
@@ -80,7 +81,7 @@ export default function Login() {
 
             <button
               onClick={() => setRole("client")}
-              className={`flex-1 py-2 rounded-lg transition ${
+              className={`flex-1 py-2 rounded-lg ${
                 role === "client"
                   ? "bg-cyan-500 text-white"
                   : "bg-slate-700 text-slate-300"
@@ -91,34 +92,25 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Login Button */}
+        {/* Button */}
         <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="btn-accent w-full flex items-center justify-center gap-2"
+          onClick={handleSignup}
+          className="btn-accent w-full"
         >
-          {loading ? (
-            <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-          ) : (
-            "Login →"
-          )}
+          Signup →
         </button>
-
-        {/* Signup Redirect (optional) */}
-        <p className="text-center text-sm text-slate-400 mt-4">
-          Don’t have an account?{" "}
-          <span
-            onClick={() => navigate("/signup")}
-            className="text-indigo-400 cursor-pointer hover:underline"
-          >
-            Signup
-          </span>
-        </p>
 
         {/* Footer */}
         <p className="text-center text-xs text-slate-500 mt-6">
-          Powered by AI Automation
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-indigo-400 cursor-pointer"
+          >
+            Login
+          </span>
         </p>
+
       </div>
     </div>
   );
