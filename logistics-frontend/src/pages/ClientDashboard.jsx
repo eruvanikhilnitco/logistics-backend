@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function ClientDashboard() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const email = localStorage.getItem("email");
@@ -14,11 +16,21 @@ export default function ClientDashboard() {
       }
     )
       .then(res => setData(res.data))
-      .catch(console.log);
+      .catch(() => toast.error("Failed to load deliveries"))
+      .finally(() => setLoading(false));
   }, []);
 
   const completed = data.filter(d => d.status === "completed").length;
   const pending = data.filter(d => d.status === "pending").length;
+
+  // ✅ LOADING UI
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
+        <div className="animate-spin h-10 w-10 border-4 border-cyan-500 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-900 text-white">
@@ -104,7 +116,7 @@ export default function ClientDashboard() {
               {data.map((d, index) => (
                 <div
                   key={index}
-                  className="bg-slate-800 p-4 rounded-xl flex justify-between items-center"
+                  className="bg-slate-800 p-4 rounded-xl flex justify-between items-center hover:scale-[1.01]"
                 >
                   <div>
                     <p className="text-sm text-slate-400">Shipment ID</p>
@@ -130,9 +142,9 @@ export default function ClientDashboard() {
 
                   <button
                     className="btn-primary"
-                    onClick={() => alert("Calling Driver...")}
+                    onClick={() => toast("📞 Calling Driver...")}
                   >
-                    📞 Call
+                    Call
                   </button>
                 </div>
               ))}
@@ -140,13 +152,13 @@ export default function ClientDashboard() {
           )}
         </div>
 
-        {/* ✅ Support Section */}
+        {/* ✅ Support */}
         <div id="support" className="section">
           <h3 className="mb-4 font-semibold">Support</h3>
 
-          <div className="text-slate-400">
-            For any queries, contact your driver or support team.
-          </div>
+          <p className="text-slate-400">
+            Need help? Contact your driver or reach support.
+          </p>
         </div>
 
       </div>

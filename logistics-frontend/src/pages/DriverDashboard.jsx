@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -9,6 +10,8 @@ const COLORS = ["#22C55E", "#F59E0B"];
 
 export default function DriverDashboard() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const email = localStorage.getItem("email");
@@ -20,7 +23,8 @@ export default function DriverDashboard() {
       }
     )
       .then(res => setData(res.data))
-      .catch(console.log);
+      .catch(() => toast.error("Failed to load data"))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleUpload = async (e) => {
@@ -35,13 +39,18 @@ export default function DriverDashboard() {
     formData.append("email", email);
 
     try {
+      setUploading(true);
+
       await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
         formData
       );
-      alert("✅ Uploaded");
+
+      toast.success("Uploaded successfully 🚀");
     } catch {
-      alert("❌ Upload failed");
+      toast.error("Upload failed ❌");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -53,6 +62,15 @@ export default function DriverDashboard() {
     { name: "Completed", value: completed },
     { name: "Pending", value: pending }
   ];
+
+  // ✅ LOADING SCREEN
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
+        <div className="animate-spin h-10 w-10 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-900 text-white">
@@ -98,14 +116,14 @@ export default function DriverDashboard() {
       {/* 🔥 Main */}
       <div className="flex-1 p-8">
 
-        {/* ✅ Dashboard Section */}
+        {/* Dashboard */}
         <div id="dashboard">
           <h1 className="text-3xl font-bold mb-6">
             Driver Dashboard
           </h1>
         </div>
 
-        {/* 🔥 Stats */}
+        {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
 
           <div className="card">
@@ -130,18 +148,18 @@ export default function DriverDashboard() {
 
         </div>
 
-        {/* ✅ Upload Section */}
+        {/* Upload */}
         <div id="upload" className="section mb-8">
           <h3 className="mb-3 font-semibold">Upload Documents</h3>
-          <input
-            type="file"
-            multiple
-            onChange={handleUpload}
-            className="text-sm"
-          />
+
+          {uploading ? (
+            <p className="text-yellow-400">Uploading...</p>
+          ) : (
+            <input type="file" multiple onChange={handleUpload} />
+          )}
         </div>
 
-        {/* ✅ History / Charts */}
+        {/* Charts */}
         <div id="history" className="grid md:grid-cols-2 gap-6">
 
           {/* PIE */}
