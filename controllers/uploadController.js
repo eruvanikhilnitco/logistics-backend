@@ -2,17 +2,20 @@ import axios from "axios";
 
 const handleUpload = async (req, res) => {
   try {
-    console.log("BODY:", req.body); // 🔥 DEBUG (must show driver_email)
+    console.log("BODY:", req.body); // debug
 
     const files = req.files;
-    const driver_email = req.body.driver_email; // ✅ ensure correct key
+
+    // 🔥 FIX: extract correctly
+    const driver_email =
+      req.body.driver_email ||
+      req.body["driver_email"] ||
+      req.body.email; // fallback
+
+    console.log("DRIVER EMAIL:", driver_email); // 🔥 MUST PRINT
 
     if (!driver_email) {
       return res.status(400).json({ error: "driver_email missing" });
-    }
-
-    if (!files || files.length === 0) {
-      return res.status(400).json({ error: "No files uploaded" });
     }
 
     const formattedFiles = files.map(file => ({
@@ -21,20 +24,19 @@ const handleUpload = async (req, res) => {
       mimeType: file.mimetype
     }));
 
-    // ✅ SEND TO N8N
+    // ✅ SEND TO N8N (CONFIRMED)
     const response = await axios.post(process.env.N8N_WEBHOOK_URL, {
-      driver_email,   // 🔥 important
+      driver_email,  // 🔥 MUST APPEAR IN N8N
       files: formattedFiles
     });
 
     res.json({
-      message: "Files sent to n8n",
-      driver_email, // debug response
-      n8n_response: response.data
+      message: "Sent to n8n",
+      driver_email
     });
 
   } catch (err) {
-    console.error("UPLOAD ERROR:", err);
+    console.error(err);
     res.status(500).json({ error: "Upload failed" });
   }
 };
