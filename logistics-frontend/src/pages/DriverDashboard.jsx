@@ -64,18 +64,46 @@ export default function DriverDashboard() {
         </h2>
 
         <div className="space-y-3 text-slate-400">
-          <p className="hover:text-white cursor-pointer">Dashboard</p>
-          <p className="hover:text-white cursor-pointer">Upload</p>
-          <p className="hover:text-white cursor-pointer">History</p>
+
+          <button
+            onClick={() =>
+              document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" })
+            }
+            className="block hover:text-white"
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() =>
+              document.getElementById("upload").scrollIntoView({ behavior: "smooth" })
+            }
+            className="block hover:text-white"
+          >
+            Upload
+          </button>
+
+          <button
+            onClick={() =>
+              document.getElementById("history").scrollIntoView({ behavior: "smooth" })
+            }
+            className="block hover:text-white"
+          >
+            History
+          </button>
+
         </div>
       </div>
 
       {/* 🔥 Main */}
       <div className="flex-1 p-8">
 
-        <h1 className="text-3xl font-bold mb-6">
-          Driver Dashboard
-        </h1>
+        {/* ✅ Dashboard Section */}
+        <div id="dashboard">
+          <h1 className="text-3xl font-bold mb-6">
+            Driver Dashboard
+          </h1>
+        </div>
 
         {/* 🔥 Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -102,8 +130,8 @@ export default function DriverDashboard() {
 
         </div>
 
-        {/* 🔥 Upload */}
-        <div className="section mb-8">
+        {/* ✅ Upload Section */}
+        <div id="upload" className="section mb-8">
           <h3 className="mb-3 font-semibold">Upload Documents</h3>
           <input
             type="file"
@@ -113,28 +141,50 @@ export default function DriverDashboard() {
           />
         </div>
 
-        {/* 🔥 Charts */}
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* ✅ History / Charts */}
+        <div id="history" className="grid md:grid-cols-2 gap-6">
 
-          <div className="card flex justify-center">
-            <PieChart width={300} height={300}>
-              <Pie data={pieData} dataKey="value">
-                {pieData.map((entry, i) => (
-                  <Cell key={i} fill={COLORS[i]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+          {/* PIE */}
+          <div className="card">
+            <h3 className="mb-4 font-semibold">
+              Delivery Status Overview
+            </h3>
+
+            {data.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded">
+                No data yet (Upload invoices to generate insights)
+              </div>
+            ) : (
+              <PieChart width={300} height={300}>
+                <Pie data={pieData} dataKey="value">
+                  {pieData.map((entry, i) => (
+                    <Cell key={i} fill={COLORS[i]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            )}
           </div>
 
+          {/* BAR */}
           <div className="card">
-            <BarChart width={400} height={300} data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="shipment_id" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="charges" fill="#4F46E5" />
-            </BarChart>
+            <h3 className="mb-4 font-semibold">
+              Revenue per Shipment
+            </h3>
+
+            {data.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded">
+                No revenue data available
+              </div>
+            ) : (
+              <BarChart width={400} height={300} data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="shipment_id" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="charges" fill="#4F46E5" />
+              </BarChart>
+            )}
           </div>
 
         </div>
