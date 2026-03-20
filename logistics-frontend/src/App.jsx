@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import DriverDashboard from "./pages/DriverDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup"; // ✅ NEW
+import Signup from "./pages/Signup";
 
 // ✅ Auth Check
 const isAuthenticated = () => {
@@ -27,13 +27,13 @@ const ProtectedRoute = ({ children, role }) => {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
 
         {/* ✅ Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} /> {/* ✅ NEW */}
+        <Route path="/signup" element={<Signup />} />
 
         {/* ✅ Protected */}
         <Route
@@ -58,7 +58,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
 
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
