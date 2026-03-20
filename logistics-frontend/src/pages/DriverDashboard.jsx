@@ -33,20 +33,30 @@ export default function DriverDashboard() {
     }
   };
 
+  // 🔥 AUTO REFRESH EVERY 5s
   useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  // ✅ UPLOAD (FIXED)
+  // ✅ UPLOAD (FINAL FIX)
   const handleUpload = async (e) => {
     const files = e.target.files;
+
+    if (!email) {
+      toast.error("User not logged in");
+      return;
+    }
+
     const formData = new FormData();
 
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i]);
     }
 
-    // 🔥 ONLY DRIVER EMAIL (CORRECT ARCHITECTURE)
+    // 🔥 DRIVER EMAIL (MAIN FIX)
+    console.log("Sending driver_email:", email); // debug
     formData.append("driver_email", email);
 
     try {
@@ -54,18 +64,14 @@ export default function DriverDashboard() {
 
       await axios.post(
         "https://logistics-backend-0zah.onrender.com/api/upload/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
+        formData
       );
 
       toast.success("Uploaded successfully 🚀");
 
-      fetchData(); // refresh
-    } catch {
+      fetchData(); // instant refresh
+    } catch (err) {
+      console.error(err);
       toast.error("Upload failed ❌");
     } finally {
       setUploading(false);
@@ -131,13 +137,12 @@ export default function DriverDashboard() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Driver Dashboard</h1>
           <div className="text-sm text-slate-400">
-            👤 {name}
+            👤 {name || "Driver"}
           </div>
         </div>
 
         {/* Stats */}
         <div id="dashboard" className="grid md:grid-cols-4 gap-6 mb-8">
-
           <div className="card">
             <p className="subtext">Total</p>
             <h2 className="text-2xl">{data.length}</h2>
@@ -157,7 +162,6 @@ export default function DriverDashboard() {
             <p className="subtext">Revenue</p>
             <h2 className="text-2xl text-indigo-400">₹{revenue}</h2>
           </div>
-
         </div>
 
         {/* Upload */}
