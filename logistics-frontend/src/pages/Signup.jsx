@@ -1,28 +1,54 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { supabase } from "../supabase";
 
 export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // ✅ added
   const [role, setRole] = useState("driver");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSignup = () => {
-    if (!name || !email) {
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
       return toast.error("All fields required");
     }
 
-    // ✅ Store user info
-    localStorage.setItem("name", name);
-    localStorage.setItem("email", email);
-    localStorage.setItem("role", role);
+    try {
+      setLoading(true);
 
-    toast.success("Signup successful 🚀");
+      // ✅ 1. Create Auth User
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
 
-    // ✅ Redirect to dashboard directly (better UX)
-    navigate(role === "driver" ? "/driver" : "/client");
+      if (error) throw error;
+
+      // ✅ 2. Store extra user data
+      const { error: dbError } = await supabase.from("users").insert([
+        {
+          name,
+          email,
+          role
+        }
+      ]);
+
+      if (dbError) throw dbError;
+
+      toast.success("Signup successful 🚀");
+
+      // ✅ Redirect to login
+      navigate("/login");
+
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,6 +89,18 @@ export default function Signup() {
           />
         </div>
 
+        {/* Password */}
+        <div className="mb-4">
+          <label className="text-sm text-slate-400">Password</label>
+          <input
+            type="password"
+            placeholder="Enter password"
+            className="input mt-1"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
         {/* Role */}
         <div className="mb-6">
           <label className="text-sm text-slate-400">Select Role</label>
@@ -95,9 +133,10 @@ export default function Signup() {
         {/* Button */}
         <button
           onClick={handleSignup}
+          disabled={loading}
           className="btn-accent w-full"
         >
-          Signup →
+          {loading ? "Creating..." : "Signup →"}
         </button>
 
         {/* Footer */}
